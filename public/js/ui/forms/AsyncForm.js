@@ -13,7 +13,18 @@ class AsyncForm {
    * через registerEvents()
    * */
   constructor(element) {
+    if (!element) {
+      throw new Error("Элемент формы не передан");
+    }
+    
+    if (!(element instanceof HTMLFormElement)) {
+      throw new Error(
+        "Передан некорректный элемент: ожидается HTMLFormElement",
+      );
+    }
 
+    this.element = element;
+    this.registerEvents();
   }
 
   /**
@@ -21,7 +32,10 @@ class AsyncForm {
    * вызывает метод submit()
    * */
   registerEvents() {
-
+    this.element.addEventListener("submit", event => {
+      event.preventDefault();
+      this.submit();
+    });
   }
 
   /**
@@ -32,18 +46,24 @@ class AsyncForm {
    * }
    * */
   getData() {
+    const formData = new FormData(this.element);
+    const data = {};
 
+    for (const [name, value] of formData.entries()) {
+      data[name] = value;
+    }
+
+    return data;
   }
 
-  onSubmit(options){
-
-  }
+  onSubmit(options) {}
 
   /**
    * Вызывает метод onSubmit и передаёт туда
    * данные, полученные из метода getData()
    * */
   submit() {
-
+    const data = this.getData();
+    this.onSubmit(data);
   }
 }

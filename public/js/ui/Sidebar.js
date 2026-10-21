@@ -18,7 +18,14 @@ class Sidebar {
    * при нажатии на кнопку .sidebar-toggle
    * */
   static initToggleButton() {
+    const toggleBtn = document.querySelector(".sidebar-toggle");
+    if (!toggleBtn) return;
 
+    toggleBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      document.body.classList.toggle("sidebar-open");
+      document.body.classList.toggle("sidebar-collapse");
+    });
   }
 
   /**
@@ -29,6 +36,37 @@ class Sidebar {
    * выходу устанавливает App.setState( 'init' )
    * */
   static initAuthLinks() {
+    const sidebar = document.querySelector(".sidebar");
+    sidebar.addEventListener("click", (event) => {
+      const menuItem = event.target.closest("li.menu-item");
+      if (!menuItem) return;
 
+      event.preventDefault();
+
+      if (menuItem.matches(".menu-item_login")) {
+        const loginModal = App.getModal("login");
+        if (loginModal) {
+          loginModal.open();
+        }
+      } else if (menuItem.matches(".menu-item_register")) {
+        const registerModal = App.getModal("register");
+        if (registerModal) {
+          registerModal.open();
+        }
+      } else if (menuItem.matches(".menu-item_logout")) {
+        User.logout((error, response) => {
+          if (error) {
+            console.error("Ошибка при выходе: " + error);
+            return;
+          }
+
+          if (response && response.success === true) {
+            App.setState("init");
+          } else {
+            console.warn("Выход не подтвержден: " + response);
+          }
+        });
+      }
+    });
   }
 }
